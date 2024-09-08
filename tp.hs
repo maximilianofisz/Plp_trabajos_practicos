@@ -62,48 +62,70 @@ instance Show a => Show (Trie a) where
                 childrenLines = concatMap (\(c, t) -> showTrie (indent ++ "  " ++ [c] ++ ": ") t) children
             in valueLine ++ childrenLines
 
-
 --Ejercicio 1
 procVacio :: Procesador a b
-procVacio = undefined
+procVacio = const []
 
 procId :: Procesador a a
-procId = undefined
+procId = \x -> [x]
 
 procCola :: Procesador [a] a
-procCola = undefined
+procCola = \x -> if null x then [] else tail x
 
 procHijosRose :: Procesador (RoseTree a) (RoseTree a)
-procHijosRose = undefined
+procHijosRose = \(Rose _ hijos) -> hijos 
 
 procHijosAT :: Procesador (AT a) (AT a)
-procHijosAT = undefined
+procHijosAT at = case at of
+                        Nil -> []
+                        (Tern _ a b c) -> [a, b, c]
 
 procRaizTrie :: Procesador (Trie a) (Maybe a)
-procRaizTrie  = undefined
+procRaizTrie = \(TrieNodo x _) -> [x]
 
 procSubTries :: Procesador (Trie a) (Char, Trie a)
-procSubTries  = undefined
+procSubTries  = \(TrieNodo _ x) -> x
 
 
 --Ejercicio 2
 
---foldAT :: undefined
-foldAT = undefined
+foldAT :: (a -> b -> b -> b -> b) -> b -> AT a -> b
+foldAT cTern cNil at = case at of
+                            Nil -> cNil
+                            Tern raiz izq cen der -> cTern raiz (f izq) (f cen) (f der)
+                        where f = foldAT cTern cNil
 
---foldRose :: undefined
-foldRose = undefined
+foldRose :: (a -> [b] -> b) -> RoseTree a -> b 
+foldRose cRose (Rose rose hijos) = cRose rose (map rec hijos)
+                                where rec = foldRose cRose
 
---foldTrie :: undefined
-foldTrie = undefined
+foldTrie :: ((Maybe a) -> [b] -> b) -> Trie a -> b
+foldTrie cTrie (TrieNodo maybe hijos) = cTrie maybe (map rec (snd (unzip hijos)))
+                                    where rec = foldTrie cTrie
+
+-- RoseTrees
+--data RoseTree a = Rose a [RoseTree a] deriving Eq
+--E.g., rt = Rose 1 [Rose 2 [], Rose 3 [], Rose 4 [], Rose 5 []] 
+--es el RoseTree con 1 en la raíz y 4 hijos (2, 3, 4 y 5)
+
+--AT
+--data AT a = Nil | Tern a (AT a) (AT a) (AT a) deriving Eq
+--E.g., at = Tern 1 (Tern 2 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 4 Nil Nil Nil)
+--Es es árbol ternario con 1 en la raíz, y con sus tres hijos 2, 3 y 4.
+
+-- Tries
+--data Trie a = TrieNodo (Maybe a) [(Char, Trie a)] deriving Eq
+-- E.g., t = TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]), ('c', TrieNodo (Just True) [])]
+-- es el Trie Bool de que tiene True en la raíz, tres hijos (a, b, y c), y, a su vez, b tiene como hijo a d.
 
 
 --Ejercicio 3
 unoxuno :: Procesador [a] [a]
-unoxuno = undefined
+unoxuno = foldr f []
+    where f = \x rec -> [x] : rec
 
 sufijos :: Procesador [a] [a]
-sufijos = undefined
+sufijos input = foldl (\ac x -> (x : (head ac)) : ac) [[]] (reverse input)
 
 
 --Ejercicio 4
