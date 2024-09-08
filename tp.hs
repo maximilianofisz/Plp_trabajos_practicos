@@ -121,11 +121,11 @@ foldTrie cTrie (TrieNodo maybe hijos) = cTrie maybe (map rec (snd (unzip hijos))
 
 --Ejercicio 3
 unoxuno :: Procesador [a] [a]
-unoxuno = foldr f []
+unoxuno = \lista -> foldr f [] lista
     where f = \x rec -> [x] : rec
 
 sufijos :: Procesador [a] [a]
-sufijos input = foldl (\ac x -> (x : (head ac)) : ac) [[]] (reverse input)
+sufijos = \lista -> foldl (\ac x -> (x : (head ac)) : ac) [[]] (reverse lista)
 
 
 --Ejercicio 4
@@ -197,6 +197,9 @@ allTests = test [ -- Reemplazar los tests de prueba por tests propios
   "ejercicio8c" ~: testsEj8c
   ]
 
+-- Formato de tests: {expresion que espero recibir al llamar a mi funcion} ~=? {llamado a la funcion con el argumento correspondiente}
+-- separados por comas, adentro de la lista 'test'
+
 testsEj1 = test [ -- Casos de test para el ejercicio 1
   0             -- Caso de test 1 - expresión a testear
     ~=? 0                                                               -- Caso de test 1 - resultado esperado
@@ -211,8 +214,17 @@ testsEj2 = test [ -- Casos de test para el ejercicio 2
   ]
 
 testsEj3 = test [ -- Casos de test para el ejercicio 3
-  'a'      -- Caso de test 1 - expresión a testear
-    ~=? 'a'            -- Caso de test 1 - resultado esperado
+  -- Unoxuno
+    [[3], [1], [4], [1], [5], [9]] ~=? unoxuno  [3,1,4,1,5,9],
+    [] ~=? unoxuno "",
+    [[1]] ~=? unoxuno [1],
+    [["Plp"]] ~=? unoxuno ["Plp"],
+
+    -- Sufijos
+    ["Plp", "lp", "p", ""] ~=? sufijos "Plp",
+    [""] ~=? sufijos "",
+    [[1,2,3], [2,3], [3], []] ~=? sufijos [1,2,3],
+    [[True, False, True], [False, True], [True], []] ~=? sufijos [True, False, True]
   ]
 
 testsEj4 = test [ -- Casos de test para el ejercicio 4
