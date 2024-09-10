@@ -99,24 +99,9 @@ foldRose :: (a -> [b] -> b) -> RoseTree a -> b
 foldRose cRose (Rose rose hijos) = cRose rose (map rec hijos)
                                 where rec = foldRose cRose
 
-foldTrie :: ((Maybe a) -> [b] -> b) -> Trie a -> b
-foldTrie cTrie (TrieNodo maybe hijos) = cTrie maybe (map rec (snd (unzip hijos)))
+foldTrie :: ((Maybe a) -> [Char] -> [b] -> b) -> (Trie a) -> b
+foldTrie cTrie (TrieNodo maybe hijos) = cTrie maybe (fst (unzip hijos)) (map rec (snd (unzip hijos)))
                                     where rec = foldTrie cTrie
-
--- RoseTrees
---data RoseTree a = Rose a [RoseTree a] deriving Eq
---E.g., rt = Rose 1 [Rose 2 [], Rose 3 [], Rose 4 [], Rose 5 []] 
---es el RoseTree con 1 en la raíz y 4 hijos (2, 3, 4 y 5)
-
---AT
---data AT a = Nil | Tern a (AT a) (AT a) (AT a) deriving Eq
---E.g., at = Tern 1 (Tern 2 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 4 Nil Nil Nil)
---Es es árbol ternario con 1 en la raíz, y con sus tres hijos 2, 3 y 4.
-
--- Tries
---data Trie a = TrieNodo (Maybe a) [(Char, Trie a)] deriving Eq
--- E.g., t = TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]), ('c', TrieNodo (Just True) [])]
--- es el Trie Bool de que tiene True en la raíz, tres hijos (a, b, y c), y, a su vez, b tiene como hijo a d.
 
 
 --Ejercicio 3
@@ -129,31 +114,38 @@ sufijos = \lista -> foldl (\ac x -> (x : (head ac)) : ac) [[]] (reverse lista)
 
 
 --Ejercicio 4
---preorder :: undefined
-preorder = undefined
 
---inorder :: undefined
-inorder = undefined
+-- at = Tern 16 (Tern 1 Nil Nil Nil) (Tern 14 (Tern 0 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 6 Nil Nil Nil)) (Tern 10 Nil Nil Nil)
 
---postorder :: undefined
-postorder = undefined
+preorder :: Procesador (AT a) a
+preorder = foldAT (\raiz izq cen der -> [raiz] ++ izq ++ cen ++ der) []
+
+inorder :: Procesador (AT a) a
+inorder = foldAT (\raiz izq cen der -> izq ++ cen ++ [raiz] ++ der) []
+
+postorder :: Procesador (AT a) a
+postorder = foldAT (\raiz izq cen der -> izq ++ cen ++ der ++ [raiz]) []
 
 --Ejercicio 5
 
+-- rt = Rose 1 [Rose 2 [], Rose 3 [Rose 6 [], Rose 7 []], Rose 4 [], Rose 5 []] 
+
 preorderRose :: Procesador (RoseTree a) a
-preorderRose = undefined
+preorderRose = foldRose (\rose rec -> rose : concat rec)
 
 hojasRose :: Procesador (RoseTree a) a
-hojasRose = undefined
+hojasRose = foldRose (\rose rec -> if null rec then [rose] else concat rec)
 
 ramasRose :: Procesador (RoseTree a) [a]
-ramasRose = undefined
+ramasRose =  foldRose (\rose rec -> if null rec then [[rose]] else map (rose :) (concat rec))
 
-
+--foldTrie :: ((Maybe a) -> [Char] -> [b] -> b) -> (Trie a) -> b
+--foldTrie cTrie (TrieNodo maybe hijos) = cTrie maybe (fst (unzip hijos)) (map rec (snd (unzip hijos)))
+--                                    where rec = foldTrie cTrie
 --Ejercicio 6
 
---caminos :: undefined
-caminos = undefined
+caminos :: Procesador (Trie a) [Char]
+caminos = foldTrie (\maybe letras rec -> if null letras then [[]] else map (letras :) (concat rec)) 
 
 
 --Ejercicio 7
@@ -200,12 +192,24 @@ allTests = test [ -- Reemplazar los tests de prueba por tests propios
 -- Formato de tests: {expresion que espero recibir al llamar a mi funcion} ~=? {llamado a la funcion con el argumento correspondiente}
 -- separados por comas, adentro de la lista 'test'
 
+-- Preguntar como hacer funcar las cosas con listas vacias
 testsEj1 = test [ -- Casos de test para el ejercicio 1
-  0             -- Caso de test 1 - expresión a testear
-    ~=? 0                                                               -- Caso de test 1 - resultado esperado
-  ,
-  1     -- Caso de test 2 - expresión a testear
-    ~=? 1                                                               -- Caso de test 2 - resultado esperado
+  -- procVacio
+    -- [] ~=? procVacio []
+    --[] ~=? procVacio (Tern 1 (Tern 2 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 4 Nil Nil Nil)),
+    --[] ~=? procVacio (Rose 1 [Rose 2 [], Rose 3 [], Rose 4 [], Rose 5 []]),
+    --[] ~=? procVacio (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]), ('c', TrieNodo (Just True) [])]),
+  
+  -- procId
+    [[1,2,3]] ~=? procId [1,2,3],
+    [Tern 1 (Tern 2 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 4 Nil Nil Nil)] ~=? procId (Tern 1 (Tern 2 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 4 Nil Nil Nil)),                       
+    [Rose 1 [Rose 2 [], Rose 3 [], Rose 4 [], Rose 5 []]] ~=? procId (Rose 1 [Rose 2 [], Rose 3 [], Rose 4 [], Rose 5 []]),
+    [TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]), ('c', TrieNodo (Just True) [])]] ~=? procId (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]), ('c', TrieNodo (Just True) [])]),
+  
+  --procCola 
+    [2,3] ~=? procCola [1,2,3]
+    --[] ~=? procCola []
+
   ]
 
 testsEj2 = test [ -- Casos de test para el ejercicio 2
