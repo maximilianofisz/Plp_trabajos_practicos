@@ -1,7 +1,7 @@
 module Proceso (Procesador, AT(Nil,Tern), RoseTree(Rose), Trie(TrieNodo), foldAT, foldRose, foldTrie, procVacio, procId, procCola, procHijosRose, procHijosAT, procRaizTrie, procSubTries, unoxuno, sufijos, inorder, preorder, postorder, preorderRose, hojasRose, ramasRose, caminos, palabras, ifProc,(++!), (.!)) where
 
 import Test.HUnit
-
+import Data.Maybe
 
 --Definiciones de tipos
 
@@ -99,9 +99,8 @@ foldRose :: (a -> [b] -> b) -> RoseTree a -> b
 foldRose cRose (Rose rose hijos) = cRose rose (map rec hijos)
                                 where rec = foldRose cRose
 
-foldTrie :: ((Maybe a) -> [Char] -> [b] -> b) -> (Trie a) -> b
-foldTrie cTrie (TrieNodo maybe hijos) = cTrie maybe (fst (unzip hijos)) (map rec (snd (unzip hijos)))
-                                    where rec = foldTrie cTrie
+foldTrie cTrie (TrieNodo maybe hijos) = cTrie maybe (map rec hijos)
+                                where rec = (\(char, trie) -> (char, foldTrie cTrie trie))
 
 
 --Ejercicio 3
@@ -139,19 +138,17 @@ hojasRose = foldRose (\rose rec -> if null rec then [rose] else concat rec)
 ramasRose :: Procesador (RoseTree a) [a]
 ramasRose =  foldRose (\rose rec -> if null rec then [[rose]] else map (rose :) (concat rec))
 
---foldTrie :: ((Maybe a) -> [Char] -> [b] -> b) -> (Trie a) -> b
---foldTrie cTrie (TrieNodo maybe hijos) = cTrie maybe (fst (unzip hijos)) (map rec (snd (unzip hijos)))
---                                    where rec = foldTrie cTrie
---Ejercicio 6
 
+--Ejercicio 6
 caminos :: Procesador (Trie a) [Char]
-caminos = foldTrie (\maybe letras rec -> if null letras then [[]] else map (letras :) (concat rec)) 
+caminos = foldTrie (\_ rec -> if null rec then [[]] else [] : concat ((map (\(char, rec2) -> (map (char : ) rec2))) rec))
 
 
 --Ejercicio 7
 
---palabras :: undefined
-palabras = undefined
+palabras :: Procesador (Trie a) [Char]
+palabras = foldTrie (\maybe rec -> if null rec then if (isNothing maybe) then [] else [[]] else if (isNothing maybe) then (concat (camino rec)) else [] : (concat (camino rec))) 
+                              where camino = (map (\(char, rec2) -> (map (char : ) rec2)))
 
 
 --Ejercicio 8
