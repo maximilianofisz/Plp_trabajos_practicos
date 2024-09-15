@@ -154,15 +154,22 @@ palabras = foldTrie (\maybe rec -> if null rec then if (isNothing maybe) then []
 --Ejercicio 8
 -- 8.a)
 ifProc :: (a->Bool) -> Procesador a b -> Procesador a b -> Procesador a b
-ifProc = undefined
+ifProc ifcond iftrue iffalse = (\x -> if ifcond x then iftrue x else iffalse x)
+
+esNil :: AT a -> Bool
+esNil Nil = True
+esNil _ = False
+
 
 -- 8.b)
+-- at = Tern 16 (Tern 1 (Tern 9 Nil Nil Nil) (Tern 7 Nil Nil Nil) (Tern 2 Nil Nil Nil)) (Tern 14 (Tern 0 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 6 Nil Nil Nil)) (Tern 10 (Tern 8 Nil Nil Nil) (Tern 5 Nil Nil Nil) (Tern 4 Nil Nil Nil))
+
 (++!) :: Procesador a b -> Procesador a b -> Procesador a b
-(++!) = undefined
+(++!) pri seg = (\x -> pri x ++ seg x)
 
 -- 8.c)
 (.!) :: Procesador b c -> Procesador a b -> Procesador a c
-(.!) = undefined
+(.!) pri seg = (\x -> concat (map pri (seg x)))
 
 --Ejercicio 9
 -- Se recomienda poner la demostración en un documento aparte, por claridad y prolijidad, y, preferentemente, en algún formato de Markup o Latex, de forma de que su lectura no sea complicada.
