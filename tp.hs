@@ -198,51 +198,134 @@ allTests = test [ -- Reemplazar los tests de prueba por tests propios
 
 -- Preguntar como hacer funcar las cosas con listas vacias
 testsEj1 = test [ -- Casos de test para el ejercicio 1
-  -- procVacio
-    -- [] ~=? procVacio []
-    --[] ~=? procVacio (Tern 1 (Tern 2 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 4 Nil Nil Nil)),
-    --[] ~=? procVacio (Rose 1 [Rose 2 [], Rose 3 [], Rose 4 [], Rose 5 []]),
-    --[] ~=? procVacio (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]), ('c', TrieNodo (Just True) [])]),
-  
-  -- procId
-    [[1,2,3]] ~=? procId [1,2,3],
-    [Tern 1 (Tern 2 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 4 Nil Nil Nil)] ~=? procId (Tern 1 (Tern 2 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 4 Nil Nil Nil)),                       
-    [Rose 1 [Rose 2 [], Rose 3 [], Rose 4 [], Rose 5 []]] ~=? procId (Rose 1 [Rose 2 [], Rose 3 [], Rose 4 [], Rose 5 []]),
-    [TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]), ('c', TrieNodo (Just True) [])]] ~=? procId (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]), ('c', TrieNodo (Just True) [])]),
-  
-  --procCola 
-    [2,3] ~=? procCola [1,2,3]
-    --[] ~=? procCola []
+  --procVacio:
+      --[] ~=? procVacio 23,
+      --[] ~=? procVacio True
+      --[] ~=? procVacio [],
+      --[] ~=? procVacio [1, 2, 3],
+      --[] ~=? procVacio "test",
+      --[] ~=? procVacio Nil,
+      --[] ~=? procVacio (Tern 12 Nil Nil (Tern 22 (Tern 9 Nil Nil Nil) (Tern 2 Nil Nil Nil) Nil)),
+      --[] ~=? procVacio (Rose 12 [Rose 22 [Rose 9 [], Rose 2 []]]),
+      --[] ~=? procVacio (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [('t', TrieNodo (Just True) [])])])]), ('b', TrieNodo (Just False) [])])
+
+    --procId:
+        [23] ~=? procId 23,
+        [True] ~=? procId True,
+        --[[]] ~=? procId [],
+        [[1, 2, 3]] ~=? procId [1, 2, 3],
+        ["test"] ~=? procId "test",
+        --[Nil] ~=? procId Nil,
+        [Tern 12 Nil Nil (Tern 22 (Tern 9 Nil Nil Nil) (Tern 2 Nil Nil Nil) Nil)] ~=? procId (Tern 12 Nil Nil (Tern 22 (Tern 9 Nil Nil Nil) (Tern 2 Nil Nil Nil) Nil)),
+        [Rose 12 [Rose 22 [Rose 9 [], Rose 2 []]]] ~=? procId (Rose 12 [Rose 22 [Rose 9 [], Rose 2 []]]),
+        [TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [('t', TrieNodo (Just True) [])])])]), ('b', TrieNodo (Just False) [])]] ~=? procId (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [('t', TrieNodo (Just True) [])])])]), ('b', TrieNodo (Just False) [])]),
+
+      --procCola:
+        --[] ~=? procCola [],
+        [] ~=? procCola [23],
+        [12] ~=? procCola [23, 12],
+        [12, 22] ~=? procCola [23, 12, 22],
+        [True, True] ~=? procCola [False, True, True],
+        "est" ~=? procCola "test",
+        [Nil] ~=? procCola [(Tern 12 Nil Nil (Tern 22 (Tern 9 Nil Nil Nil) (Tern 2 Nil Nil Nil) Nil)), Nil],
+
+      --procHijosRose:
+        [] ~=? procHijosRose (Rose 12 []),
+        [Rose 22 []] ~=? procHijosRose (Rose 12 [Rose 22 []]),
+        --[Rose 22 [Rose 9 []] ~=? procHijosRose (Rose 12 [Rose 22 [Rose 9 []]])],
+        [Rose 22 [Rose 9 [], Rose 2 []]] ~=? procHijosRose (Rose 12 [Rose 22 [Rose 9 [], Rose 2 []]]),
+
+      --procHijosAT:
+        --[] ~=? procHijosAT (Nil),
+        [Nil, Nil, Nil] ~=? procHijosAT (Tern 12 Nil Nil Nil),
+        [Nil, Nil, (Tern 22 Nil Nil Nil)] ~=? procHijosAT (Tern 12 Nil Nil (Tern 22 Nil Nil Nil)),
+        [Nil, Nil, (Tern 22 Nil (Tern 2 Nil Nil Nil) Nil)] ~=? procHijosAT (Tern 12 Nil Nil (Tern 22 Nil (Tern 2 Nil Nil Nil) Nil)),
+        [Nil, Nil, (Tern 22 (Tern 9 Nil Nil Nil) (Tern 2 Nil Nil Nil) Nil)] ~=? procHijosAT (Tern 12 Nil Nil (Tern 22 (Tern 9 Nil Nil Nil) (Tern 2 Nil Nil Nil) Nil)),
+
+      --procRaizTrie:
+        --[Nothing] ~=? procRaizTrie (TrieNodo Nothing []),
+        [Just True] ~=? procRaizTrie (TrieNodo (Just True) []),
+        [Just 22] ~=? procRaizTrie (TrieNodo (Just 22) []),
+        [Just True] ~=? procRaizTrie (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [])])])]),
+        [Nothing] ~=? procRaizTrie (TrieNodo Nothing [('a', TrieNodo (Just 22) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just 12) [('s', TrieNodo Nothing [])])])]),
+        [Just ""] ~=? procRaizTrie (TrieNodo (Just "") [('a', TrieNodo (Just "a") []), ('t', TrieNodo Nothing [('e', TrieNodo (Just "te") [('s', TrieNodo Nothing [])])])]),
+
+      --procSubTries:
+        --[] ~=? (TrieNodo (Just True) []),
+        [('a', TrieNodo (Just True) [])] ~=? procSubTries (TrieNodo (Just True) [('a', TrieNodo (Just True) [])]),
+        [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [])] ~=? procSubTries (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [])]),
+        [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [])])] ~=? procSubTries (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [])])]),
+        [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [])])])] ~=? procSubTries (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [])])])]),
+        [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [('t', TrieNodo (Just True) [])])])])] ~=? procSubTries (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [('t', TrieNodo (Just True) [])])])])]),
+        [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [('t', TrieNodo (Just True) [])])])]), ('b', TrieNodo (Just False) [])] ~=? procSubTries (TrieNodo (Just True) [('a', TrieNodo (Just True) []), ('t', TrieNodo Nothing [('e', TrieNodo (Just True) [('s', TrieNodo Nothing [('t', TrieNodo (Just True) [])])])]), ('b', TrieNodo (Just False) [])])
 
   ]
 
+
 testsEj2 = test [ -- Casos de test para el ejercicio 2
-  (0,0)       -- Caso de test 1 - expresión a testear
-    ~=? (0,0)                   -- Caso de test 1 - resultado esperado
+    [] ~=? procCola [23]
   ]
 
 testsEj3 = test [ -- Casos de test para el ejercicio 3
-  -- Unoxuno
-    [[3], [1], [4], [1], [5], [9]] ~=? unoxuno  [3,1,4,1,5,9],
-    [] ~=? unoxuno "",
-    [[1]] ~=? unoxuno [1],
-    [["Plp"]] ~=? unoxuno ["Plp"],
+  -- unoxuno
+  --[]::[Int] ~=? unoxuno [],
+  --[]::[Char] ~=? unoxuno "",
+  [[1]] ~=? unoxuno [1],
+  [[3], [1], [4], [1], [5], [9]] ~=? unoxuno  [3,1,4,1,5,9],
+  ["P","a","r","a","d","i","g","m","a","s"] ~=? unoxuno "Paradigmas",
+  [[True],[False],[False],[True]] ~=? unoxuno [True,False,False,True],
 
-    -- Sufijos
-    ["Plp", "lp", "p", ""] ~=? sufijos "Plp",
-    [""] ~=? sufijos "",
-    [[1,2,3], [2,3], [3], []] ~=? sufijos [1,2,3],
-    [[True, False, True], [False, True], [True], []] ~=? sufijos [True, False, True]
+-- sufijos
+  --[]::[Int] ~=? unoxuno [], 
+  [""] ~=? sufijos "",
+  ["Plp", "lp", "p", ""] ~=? sufijos "Plp",
+  --[[[], []], [[]], []] ~=? sufijos [[], []],
+  [[1,2,3], [2,3], [3], []] ~=? sufijos [1,2,3],
+  [[True, False, True], [False, True], [True], []] ~=? sufijos [True, False, True]
+
   ]
 
 testsEj4 = test [ -- Casos de test para el ejercicio 4
-  ""       -- Caso de test 1 - expresión a testear
-    ~=? ""                             -- Caso de test 1 - resultado esperado
+  -- preorder
+    --[] ~=? preorder Nil,
+    [28] ~=? preorder (Tern 28 Nil Nil Nil),
+    "full" ~=? preorder (Tern 'f' (Tern 'u' Nil Nil Nil) (Tern 'l' Nil Nil Nil) (Tern 'l' Nil Nil Nil)), 
+    [2,3,5,7] ~=? preorder  (Tern 2 (Tern 3 (Tern 5 (Tern 7 Nil Nil Nil) Nil Nil) Nil Nil) Nil Nil),
+    [5,5,5] ~=? preorder (Tern 5 Nil (Tern 5 Nil Nil Nil) (Tern 5 Nil Nil Nil)), 
+    "Paradigmas" ~=? preorder (Tern 'P' (Tern 'a' Nil (Tern 'r' Nil Nil Nil) Nil) (Tern 'a' (Tern 'd' Nil Nil Nil) (Tern 'i' Nil Nil Nil) (Tern 'g' Nil Nil Nil)) (Tern 'm' (Tern 'a' (Tern 's' Nil Nil Nil) Nil Nil) Nil Nil)),
+    
+  -- postorder
+    --[] ~=? postorder Nil,
+    [496] ~=? postorder (Tern 496 Nil Nil Nil),
+    "ullf" ~=? postorder (Tern 'f' (Tern 'u' Nil Nil Nil) (Tern 'l' Nil Nil Nil) (Tern 'l' Nil Nil Nil)),  
+    [8,13,21,34] ~=? postorder (Tern 34 Nil (Tern 21 Nil (Tern 13 Nil (Tern 8 Nil Nil Nil) Nil) Nil) Nil),
+    "aaa" ~=? postorder (Tern 'a' Nil (Tern 'a' Nil Nil Nil) (Tern 'a' Nil Nil Nil)),
+
+  -- inorder 
+    --[] ~=? inorder Nil,
+    [8128] ~=? inorder (Tern 8128 Nil Nil Nil),
+    "ulfl" ~=? inorder (Tern 'f' (Tern 'u' Nil Nil Nil) (Tern 'l' Nil Nil Nil) (Tern 'l' Nil Nil Nil)),  
+    "radiagPsam" ~=? inorder (Tern 'P' (Tern 'a' Nil (Tern 'r' Nil Nil Nil) Nil) (Tern 'a' (Tern 'd' Nil Nil Nil) (Tern 'i' Nil Nil Nil) (Tern 'g' Nil Nil Nil)) (Tern 'm' (Tern 'a' (Tern 's' Nil Nil Nil) Nil Nil) Nil Nil)),
+    "ppp" ~=? inorder (Tern 'p' (Tern 'p' Nil Nil Nil) Nil (Tern 'p' Nil Nil Nil)) 
+
   ]
 
-testsEj5 = test [ -- Casos de test para el ejercicio 5
-  0       -- Caso de test 1 - expresión a testear
-    ~=? 0                                       -- Caso de test 1 - resultado esperado
+testsEj5 = test [ -- Casos de test para el ejercicio 5 rt = Rose 1 [Rose 2 [], Rose 3 [Rose 6 [], Rose 7 []], Rose 4 [], Rose 5 []] 
+    --preorderRose
+      [16,1,9,7,2,14,0,3,6,10,8,5,4] ~=? preorderRose (Rose 16 [Rose 1 [Rose 9 [], Rose 7 [], Rose 2 []], Rose 14 [Rose 0 [], Rose 3 [], Rose 6 []], Rose 10 [Rose 8 [], Rose 5 [], Rose 4 []]]), -- test preorder enunciado at
+      [16] ~=? preorderRose (Rose 16 []), -- rose solo con raiz
+      [16,1,14,10] ~=? preorderRose (Rose 16 [Rose 1 [], Rose 14 [], Rose 10 []]), -- rose solo con un nivel bajo la raiz
+      ["h","o","l","a"] ~=? preorderRose (Rose "h" [Rose "o" [], Rose "l" [], Rose "a" []]), -- rose solo con un nivel bajo la raiz y letras
+    
+    --hojasRose
+      [16] ~=? hojasRose (Rose 16 []), -- rose solo con raiz
+      ["o","l","a"] ~=? hojasRose (Rose "h" [Rose "o" [], Rose "l" [], Rose "a" []]), -- rose solo con un nivel bajo la raiz y letras
+      [9,7,2,0,3,6,8,5,4] ~=? hojasRose (Rose 16 [Rose 1 [Rose 9 [], Rose 7 [], Rose 2 []], Rose 14 [Rose 0 [], Rose 3 [], Rose 6 []], Rose 10 [Rose 8 [], Rose 5 [], Rose 4 []]]), -- test preorder enunciado at solo hojas
+
+    -- ramasRose
+      [[16]] ~=? ramasRose (Rose 16 []), -- rose solo con raiz
+      [["h", "o"], ["h", "l"], ["h", "a"]] ~=? ramasRose (Rose "h" [Rose "o" [], Rose "l" [], Rose "a" []]), -- rose solo con un nivel bajo la raiz y letras
+      [["a","b","c"], ["a","b","d"], ["a","b","e"], ["a","f","g"], ["a","f","h"], ["a","f","i"], ["a","j","k"], ["a","j","l"], ["a","j","m"]] ~=? ramasRose (Rose "a" [Rose "b" [Rose "c" [], Rose "d" [], Rose "e" []], Rose "f" [Rose "g" [], Rose "h" [], Rose "i" []], Rose "j" [Rose "k" [], Rose "l" [], Rose "m" []]]) -- test preorder enunciado at
   ]
 
 testsEj6 = test [ -- Casos de test para el ejercicio 6
@@ -251,8 +334,15 @@ testsEj6 = test [ -- Casos de test para el ejercicio 6
   ]
 
 testsEj7 = test [ -- Casos de test para el ejercicio 7
-  True         -- Caso de test 1 - expresión a testear
-    ~=? True                                          -- Caso de test 1 - resultado esperado
+    -- palabras
+        --[] ~=? palabras (TrieNodo Nothing []), #Trie vacio
+        ["ab"] ~=? palabras (TrieNodo Nothing [('a', TrieNodo Nothing [('b', TrieNodo (Just True) [])])]), --Trie con una sola palabra
+        ["xy","ab"] ~=? palabras (TrieNodo Nothing [('x', TrieNodo Nothing [('y', TrieNodo (Just True) [])]),('a', TrieNodo Nothing [('b', TrieNodo (Just True) [])])]), --Trie sin prefijos comunes
+        ["rojo","ojo"] ~=? palabras (TrieNodo Nothing [('r', TrieNodo Nothing [('o', TrieNodo Nothing [('j', TrieNodo Nothing [('o', TrieNodo (Just True) [])])])]),('o', TrieNodo Nothing [('j', TrieNodo Nothing [('o', TrieNodo (Just True) [])])])]),--Trie con prefijos compartidos
+        ["abc","abcd"] ~=? palabras (TrieNodo Nothing [('a', TrieNodo Nothing [('b', TrieNodo Nothing [('c', TrieNodo (Just True) [('d', TrieNodo (Just True) [])])])])]), --Subcadenas
+        ["a","ba","c"] ~=? palabras (TrieNodo Nothing [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]),('c', TrieNodo (Just True)[])]), --Enunciado
+        ["a"] ~=? palabras (TrieNodo Nothing [('a', TrieNodo (Just True) []), ('a', TrieNodo (Just True) [])]) --NO SE DEBEN INCLUIR PALABRAS REPETIDAS
+      
   ]
 
 testsEj8a = test [ -- Casos de test para el ejercicio 7
