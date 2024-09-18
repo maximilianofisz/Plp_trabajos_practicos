@@ -268,7 +268,7 @@ testsEj2 = test [ -- Casos de test para el ejercicio 2
 
 testsEj3 = test [ -- Casos de test para el ejercicio 3
   -- unoxuno
-  ([[]]::[[Int]]) ~=? unoxuno ([]::[Int]),
+  ([]::[[Int]]) ~=? unoxuno ([]::[Int]),
   ([[]]::[[Char]]) ~=? unoxuno "",
   [[1]] ~=? unoxuno [1],
   [[3], [1], [4], [1], [5], [9]] ~=? unoxuno  [3,1,4,1,5,9],
