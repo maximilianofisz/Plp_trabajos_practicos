@@ -344,9 +344,12 @@ testsEj7 = test [ -- Casos de test para el ejercicio 7
       
   ]
 
-testsEj8a = test [ -- Casos de test para el ejercicio 7
-  True         -- Caso de test 1 - expresión a testear
-    ~=? True                                          -- Caso de test 1 - resultado esperado
+testsEj8a = test [ 
+   [] ~=? ifProc esNil procVacio procId (Nil), --Test del enunciado
+   [1] ~=? ifProc esNil procVacio (\x -> [1]) (Tern 1 Nil Nil Nil), --Variante del test del enunciado
+   [5] ~=? ifProc (> 0) (\x -> if x > 0 then [x] else []) (\x -> if x < 0 then [-x] else []), 5 --Condicion true
+   [-5] ~=? ifProc (> 0) (\x -> if x > 0 then [x] else []) (\x -> if x < 0 then [x] else []) (-5), --Condicion False
+
   ]
 testsEj8b = test [ -- Casos de test para el ejercicio 7
   True         -- Caso de test 1 - expresión a testear
