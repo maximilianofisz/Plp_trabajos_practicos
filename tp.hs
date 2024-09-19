@@ -269,7 +269,7 @@ testsEj2 = test [ -- Casos de test para el ejercicio 2
 testsEj3 = test [ -- Casos de test para el ejercicio 3
   -- unoxuno
   ([]::[[Int]]) ~=? unoxuno ([]::[Int]),
-  ([[]]::[[Char]]) ~=? unoxuno "",
+  ([]::[[Char]]) ~=? unoxuno "",
   [[1]] ~=? unoxuno [1],
   [[3], [1], [4], [1], [5], [9]] ~=? unoxuno  [3,1,4,1,5,9],
   ["P","a","r","a","d","i","g","m","a","s"] ~=? unoxuno "Paradigmas",
@@ -345,17 +345,19 @@ testsEj7 = test [ -- Casos de test para el ejercicio 7
   ]
 
 testsEj8a = test [ 
-   [] ~=? ifProc esNil procVacio procId (Nil), --Test del enunciado
-   [1] ~=? ifProc esNil procVacio (\x -> [1]) (Tern 1 Nil Nil Nil), --Variante del test del enunciado
-   [5] ~=? ifProc (> 0) (\x -> if x > 0 then [x] else []) (\x -> if x < 0 then [-x] else []), 5 --Condicion true
-   [-5] ~=? ifProc (> 0) (\x -> if x > 0 then [x] else []) (\x -> if x < 0 then [x] else []) (-5), --Condicion False
-
+   ([]::[AT Int]) ~=? ifProc esNil procVacio procId (Nil), -- caso true
+   ([1]::[Int]) ~=? ifProc esNil procVacio preorder (Tern 1 Nil Nil Nil) -- caso false  
   ]
-testsEj8b = test [ -- Casos de test para el ejercicio 7
-  True         -- Caso de test 1 - expresión a testear
-    ~=? True                                          -- Caso de test 1 - resultado esperado
+testsEj8b = test [ 
+  --at = Tern 16 (Tern 1 (Tern 9 Nil Nil Nil) (Tern 7 Nil Nil Nil) (Tern 2 Nil Nil Nil)) (Tern 14 (Tern 0 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 6 Nil Nil Nil)) (Tern 10 (Tern 8 Nil Nil Nil) (Tern 5 Nil Nil Nil) (Tern 4 Nil Nil Nil))
+    [9,7,2,1,0,3,6,14,8,5,4,10,16,16,1,9,7,2,14,0,3,6,10,8,5,4] ~=? (postorder ++! preorder) (Tern 16 (Tern 1 (Tern 9 Nil Nil Nil) (Tern 7 Nil Nil Nil) (Tern 2 Nil Nil Nil)) (Tern 14 (Tern 0 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 6 Nil Nil Nil)) (Tern 10 (Tern 8 Nil Nil Nil) (Tern 5 Nil Nil Nil) (Tern 4 Nil Nil Nil))), --Test del enunciado
+    [8, -8] ~=? ((\x -> [2*x]) ++! (\x -> [-2 * x])) 4,  --Test varios
+    [0, 8] ~=? ((\x -> [x - 4]) ++! (\x -> [x+4])) 4
   ]
-testsEj8c = test [ -- Casos de test para el ejercicio 7
-  True         -- Caso de test 1 - expresión a testear
-    ~=? True                                          -- Caso de test 1 - resultado esperado
+testsEj8c = test [ 
+   [0,1,2,0,1,2,3,4] ~=? ((\z->[0..z]) .! (map (+1))) [1,3], --Test del enunciado
+   [] ~=? ((\x -> [1]) .! (procHijosAT)) Nil, -- Test con lista vacia #No estoy seguro si da bien#
+   [1] ~=? ((\x -> [x]) .! (\x -> [length x])) [1], -- Test lista con un elemento
+   [4] ~=? ((\x -> [x]) .! (\x -> [length x])) [1,2,3,4], -- Variante del anterior con mas elementos
+   [1,1,1] ~=? ((\x -> [1]) .! procHijosAT) (Tern 1 (Tern 2 Nil Nil Nil) (Tern 3 Nil Nil Nil) (Tern 4 Nil Nil Nil)) -- Probando con lista de varios elementos
   ]
