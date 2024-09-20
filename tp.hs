@@ -329,12 +329,15 @@ testsEj5 = test [ -- Casos de test para el ejercicio 5 rt = Rose 1 [Rose 2 [], R
   ]
 
 testsEj6 = test [ -- Casos de test para el ejercicio 6
-    ["", "a", "b", "ba", "bad", "c"] ~=? caminos (TrieNodo Nothing ["a", TrieNodo (Just True) [], "b", TrieNodo Nothing [("a", TrieNodo (Just True) [("d", TrieNodo Nothing [])])], ("c", TrieNodo (Just True) [])])
+    ["", "a", "b", "ba", "bad", "c"] ~=? caminos (TrieNodo Nothing [('a', TrieNodo (Just True) []), ('b', TrieNodo Nothing [('a', TrieNodo (Just True) [('d', TrieNodo Nothing [])])]), ('c', TrieNodo (Just True) [])]),
+    [""] ~=? caminos (TrieNodo Nothing []),
+    ["", "a", "ab", "abc"] ~=? caminos (TrieNodo Nothing [('a', TrieNodo (Just True) [('b', TrieNodo (Just True) [('c', TrieNodo (Just True) [])])])]),
+    ["", "a", "b", "c"] ~=? caminos (TrieNodo Nothing [('a', TrieNodo (Just True) []),('b', TrieNodo (Just True) []),('c', TrieNodo (Just True) [])])
   ]
 
 testsEj7 = test [ -- Casos de test para el ejercicio 7
     -- palabras
-        ([]::[[Char]]) ~=? palabras (TrieNodo Nothing []), --Trie vacio
+        [] ~=? palabras (TrieNodo Nothing []), --Trie vacio
         ["ab"] ~=? palabras (TrieNodo Nothing [('a', TrieNodo Nothing [('b', TrieNodo (Just True) [])])]), --Trie con una sola palabra
         ["xy","ab"] ~=? palabras (TrieNodo Nothing [('x', TrieNodo Nothing [('y', TrieNodo (Just True) [])]),('a', TrieNodo Nothing [('b', TrieNodo (Just True) [])])]), --Trie sin prefijos comunes
         ["rojo","ojo"] ~=? palabras (TrieNodo Nothing [('r', TrieNodo Nothing [('o', TrieNodo Nothing [('j', TrieNodo Nothing [('o', TrieNodo (Just True) [])])])]),('o', TrieNodo Nothing [('j', TrieNodo Nothing [('o', TrieNodo (Just True) [])])])]),--Trie con prefijos compartidos
