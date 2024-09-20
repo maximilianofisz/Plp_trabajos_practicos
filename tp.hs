@@ -329,8 +329,7 @@ testsEj5 = test [ -- Casos de test para el ejercicio 5 rt = Rose 1 [Rose 2 [], R
   ]
 
 testsEj6 = test [ -- Casos de test para el ejercicio 6
-  False       -- Caso de test 1 - expresión a testear
-    ~=? False                                            -- Caso de test 1 - resultado esperado
+    ["", "a", "b", "ba", "bad", "c"] ~=? caminos (TrieNodo Nothing ["a", TrieNodo (Just True) [], "b", TrieNodo Nothing [("a", TrieNodo (Just True) [("d", TrieNodo Nothing [])])], ("c", TrieNodo (Just True) [])])
   ]
 
 testsEj7 = test [ -- Casos de test para el ejercicio 7
