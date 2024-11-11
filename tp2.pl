@@ -4,12 +4,19 @@
 
 %% Ejercicio 1
 %% proceso(+P)
-proceso(_).
+proceso(computar).
+proceso(escribir(_, _)).
+proceso(leer(_)). 
+proceso(secuencia(P, Q)) :- proceso(P), proceso(Q).
+proceso(paralelo(P, Q)) :- proceso(P), proceso(Q).
 
 %% Ejercicio 2
 %% buffersUsados(+P,-BS)
-buffersUsados(_,_).
-
+buffersUsados(computar, []).
+buffersUsados(escribir(BS, _), [BS]).
+buffersUsados(leer(BS), [BS]).
+buffersUsados(secuencia(P, Q), BS) :- buffersUsados(P, BP), buffersUsados(Q, BQ), union(BP, BQ, BS).
+buffersUsados(paralelo(P, Q), BS) :- buffersUsados(P, BP), buffersUsados(Q, BQ), union(BP, BQ, BS). 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,11 +25,18 @@ buffersUsados(_,_).
 
 %% Ejercicio 3
 %% intercalar(+XS,+YS,?ZS)
-intercalar(_,_,_).
+intercalar([], YS, YS).
+intercalar(XS, [], XS).
+intercalar([X|XS], [Y|YS], ZS) :- intercalar(XS, [Y|YS], Rec), append([X], Rec, ZS).
+intercalar([X|XS], [Y|YS], ZS) :- intercalar([X|XS], YS, Rec), append([Y], Rec, ZS).
 
 %% Ejercicio 4
 %% serializar(+P,?XS)
-serializar(_,_).
+serializar(computar, [computar]).
+serializar(escribir(B, X), [escribir(B, X)]).
+serializar(leer(B), [leer(B)]).
+serializar(secuencia(P, Q), XS) :- serializar(P, PS), serializar(Q, QS), append(PS, QS, XS).
+serializar(paralelo(P, Q), XS) :- serializar(P, PS), serializar(Q, QS), intercalar(PS, QS, XS). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Contenido de los buffers %%
@@ -30,7 +44,27 @@ serializar(_,_).
 
 %% Ejercicio 5
 %% contenidoBuffer(+B,+ProcesoOLista,?Contenidos)
-contenidoBuffer(_,_,_).
+contenidoBuffer(B, Proceso, Contenidos) :- proceso(Proceso), serializar(Proceso, Lista), contenidoBuffer(B, Lista, Contenidos).
+contenidoBuffer(B, Lista, Contenidos) :- not(proceso(Lista)), sacarOtrosBuffers(B, Lista, ListaB), pasarContenidos(ListaB, Contenidos).
+
+%
+sacarOtrosBuffers(_, [], []).
+sacarOtrosBuffers(B, [X|XS], C) :- esAccionB(B, X), sacarOtrosBuffers(B, XS, CRec), append([X], CRec, C).
+sacarOtrosBuffers(B, [X|XS], C) :- not(esAccionB(B,X)), sacarOtrosBuffers(B, XS, C). 
+
+%
+pasarContenidos([], []).
+pasarContenidos([leer(_)|XS], YS) :- pasarContenidos(XS, Rec), append([1], YS, Rec).
+pasarContenidos([escribir(_, X)|XS], YS) :- pasarContenidos(XS, Rec), append([X], Rec, YS).
+
+%
+sacarLeidos([], []).
+sacarLeidos([escribir(B, _)|XS], YS) :- X is leido(B), member(X, XS), sacarPrimero(X, XS, ZS), escribir(ZS, YS).
+sacarLeidos([escribir(B, _)|XS], YS) :- X is leido(B), not(member(X, XS)), escribir(ZS, YS),  
+
+%
+esAccionB(B, escribir(B, _)).
+esAccionB(B, leer(B)).
 
 
 %% Ejercicio 6
